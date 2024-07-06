@@ -1,0 +1,274 @@
+{% extends 'network/index.html' %}
+
+{% load static tailwind_tags %}
+
+{% block profile %}
+{% if request.user.is_authenticated %}
+<!-- <div class=" w-screen h-screen  justify-center items-start fixed mt-36 left-0 top-0 z-20 " > -->
+<div class="hidden  h-screen w-screen items-center justify-center fixed inset-0 z-50 bg-black bg-opacity-80  " id="editprofile">
+  <div class="editprofilecontainer h-fit w-2/6 rounded-md px-6 py-4 shadow-[0_50px_100px_-10px_rgb(50,50,93,0.4),0_0_30px_-20px_rgb(0,0,0,0.5)] dark:shadow-[0_-50px_100px_-10px_rgb(164,58,185,0.2),0_50px_150px_-20px_rgb(164,58,241,0.4)] bg-white dark:bg-stone-900 ">
+    <p class="pb-2 text-lg font-semibold relative z-50 text-black dark:text-white ">Edit Profile</p>
+    <form method="post" action="{% url 'editprofile' request.user.id %}" enctype="multipart/form-data">
+        {% csrf_token %}
+      <div  class=" coverimage ring-1 ring-white relative h-36 w-full  overflow-hidden rounded-md bg-cover bg-center [background-image:url({{ username.cover.url }})]">
+        <label for="dropzone-file" class="flex items-center justify-center w-full h-full bg-black opacity-0 transition-all duration-200 ease-in-out hover:opacity-60">
+          <input name="coverimage"  type="file" id="dropzone-file" class="hidden" accept=".jpeg,.jpg,.png" onchange="coverupdate(this)" />
+          <span class="material-symbols-outlined scale-110 text-white">upload</span>
+        </label>
+        <label for="dropzone-file-profile" class="profileimage absolute left-4 top-2/4 h-28 w-28 -translate-y-2/4 overflow-hidden rounded-full bg-cover bg-center ring-1 ring-white [background-image:url({{ username.profile_pic.url }})]">
+          <input name="profileimage" onchange="profileupdate(this)" type="file" id="dropzone-file-profile" class="hidden" accept=".jpeg,.jpg,.png" />
+          <div class="flex h-full w-full items-center justify-center bg-black opacity-0 transition-all duration-200 ease-in-out hover:opacity-60">
+            <span class="material-symbols-outlined scale-110 text-white">upload</span>
+          </div>
+        </label>
+      </div>
+      <div class="my-3 grid w-full grid-cols-2 gap-2">
+        <input type="text" value="{{ username.username }}" class="rounded-md bg-gray-100 px-2 py-1 text-sm text-gray-400 cursor-not-allowed" disabled />
+        <input type="text" value="{{ username.email }}" class="rounded-md bg-gray-100 px-2 py-1 text-sm text-gray-400 cursor-not-allowed" disabled/>
+      </div>
+      <textarea name="bio" id="" cols="30" rows="8" class="h-16 max-h-40 w-full rounded-md bg-gray-100 px-2 py-1 outline-none placeholder:text-sm  text-black text-sm placeholder:text-gray-400" placeholder="update your bio">{% if username.bio %}{{username.bio}}{% endif %}</textarea>
+      <div class="flex w-full gap-2 ">
+        <!-- this is for users branch -->
+        <fieldset class="flex flex-col w-full border rounded-md px-2 py-1 ">
+            <legend class="px-1 text-xs " >Branch</legend>
+            <select name="branch" class="w-full text-zinc-800 dark:text-white outline-none bg-transparent "  >
+                <option value="na" class="text-black"  class="text-black" id=""  {% if username.branch == "na" %} selected {% endif %}   >select an option</option>
+                <option value="bca" class="text-black"  class="text-black" id=""  {% if username.branch == "bca" %} selected {% endif %}  >Bachelor of Computer Application</option>
+                <option value="bcom" class="text-black"  id="" {% if username.branch == "bcom" %} selected {% endif %} >Bachelor of Commerce</option>
+                <option value="ba" class="text-black"  id="" {% if username.branch == "ba" %} selected {% endif %}>Bachelor of Arts</option>
+            </select>
+        </fieldset>
+        <!-- this code is for  -->
+        <fieldset class="flex flex-col w-full border rounded-md px-2 py-1 bg-transparent  ">
+            <legend class="px-1 text-xs ">Position</legend>
+            <select name="staff" class="w-full outline-none  text-zinc-800 dark:text-white bg-transparent ">
+                <option value="na" class="text-black"  class="text-black  " id=""  {% if username.staff == "na" %} selected {% endif %}  >select an option</option>
+                <option class="text-black" value="principal" id="" {% if username.staff == "principal" %} selected {% endif %}>Principal</option>
+                <option class="text-black" value="lecturer" id="" {% if username.staff == "lecturer" %} selected {% endif %}>Lecturer</option>
+                <option class="text-black" value="pune" id="" {% if username.staff == "pune" %} selected {% endif %}>Pune</option>
+                <option class="text-black" value="student" id="" {% if username.staff == "student" %} selected {% endif %}>Student</option>
+                <option class="text-black" value="others" id="" {% if username.staff == "others" %} selected {% endif %} >Other staff</option>
+            </select>
+        </fieldset>
+    </div>
+      <input type="submit" value="Update" class="mt-4 cursor-pointer rounded-md bg-purple-500 px-4 py-1 text-sm text-white" />
+    </form>
+  </div>
+</div>
+{% endif %}
+
+<!--this is for followers-->
+
+<div class="hidden w-screen h-screen  justify-center items-start fixed mt-36 left-0 top-0 z-20  "  id="followers">
+    <div class="fixed inset-0 w-screen h-screen bg-black bg-opacity-0 closeFollowers " ></div>
+    <div class="w-1/5 bg-gray-50 dark:bg-neutral-900 h-fit rounded-md px-2 pt-1 pb-2 shadow-2xl shadow-gray-600 dark:shadow-black dark:shadow-2xl z-10 " >
+        <div class="flex justify-between items-center w-full pl-2 ">
+            <div class=" font-bold select-none text-neutral-900 dark:text-gray-300 ">Followers</div>
+            <div class=" p-1 dark:hover:bg-gray-800 hover:bg-gray-200 flex justify-center items-center rounded-full transition-all ease-in-out duration-300 ">
+                <span class="material-symbols-outlined dark:text-white text-gray-800 inline-block closeFollowersButton cursor-pointer ">close</span>
+            </div>
+        </div>
+        <div class="w-full bg-neutral-200 dark:bg-neutral-800 flex px-1 items-center rounded-md mb-2 ">
+            <div class="p-1 flex justify-center items-center">
+                <span class="material-symbols-outlined text-neutral-500 inline-block scale-75">search</span>
+            </div>
+            <input type="text" id='search-input' class="flex items-center outline-none w-full text-sm  placeholder:-translate-y-[2px] h-full  bg-transparent placeholder:text-neutral-600" placeholder="Search">
+        </div>
+        <div class="max-h-96 overflow-y-scroll  [&::-webkit-scrollbar]:hidden w-full">
+            {% for follower in followers %}
+            <a class="flex h-auto w-full cursor-pointer items-center justify-start  py-2 hover:bg-gray-400 hover:bg-opacity-10 dark:hover:bg-gray-50 px-2 rounded-sm dark:hover:bg-opacity-5 transition-all ease-in-out duration-300 " href="{% url 'profile' follower.username %}">
+            <div class="h-11 w-11 rounded-full bg-cover bg-center [background-image:url('{{ follower.profile_pic.url }}')]"></div>
+            <div class="px-4">
+                <p class="text-sm font-bold dark:text-white text-black">{{ follower.first_name }} {{ follower.last_name}}</p>
+                <p class="text-xs dark:text-neutral-500 text-neutral-500">{{ follower.username }}</p>
+            </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+<!--this is for following-->
+<div class="hidden w-screen h-screen  justify-center items-start mt-36 fixed left-0 top-0 z-20 " id="following">
+    <div class="fixed inset-0 w-screen h-screen bg-black bg-opacity-0 closeFollowing " ></div>
+    <div class="w-1/5 bg-gray-50 dark:bg-neutral-900 h-fit overflow-hidden rounded-md px-2 pt-1 pb-2 drop-shadow-2xl shadow-gray-600  dark:shadow-black dark:shadow-2xl z-10 " >
+        <div class="flex justify-between items-center w-full pl-2  ">
+            <div class=" font-bold select-none text-neutral-900 dark:text-gray-300 ">Following</div>
+            <div class=" p-1 dark:hover:bg-gray-800 hover:bg-gray-200 flex justify-center items-center rounded-full transition-all ease-in-out duration-300 ">
+                <span class="material-symbols-outlined dark:text-white text-gray-800 inline-block closeFollowingButton cursor-pointer  ">close</span>
+            </div>
+        </div>
+        <div class="w-full  bg-neutral-200 dark:bg-neutral-800 flex px-1  items-center rounded-md mb-2 ">
+            <div class="p-1 flex justify-center items-center">
+                <span class="material-symbols-outlined text-neutral-500 inline-block scale-75">search</span>
+            </div>
+            <input type="text" id='search-input-following' class="flex items-center outline-none w-full text-sm  placeholder:-translate-y-[2px] h-full  bg-transparent placeholder:text-neutral-600 " placeholder="Search">
+        </div>
+        <div class=" max-h-96 overflow-y-scroll w-full [&::-webkit-scrollbar]:hidden  ">
+            {% for follow in followings %}
+            <a class="search1 flex h-auto w-full cursor-pointer items-center justify-start  py-2 hover:bg-gray-400 hover:bg-opacity-10 dark:hover:bg-gray-50 px-2 rounded-sm dark:hover:bg-opacity-5 transition-all ease-in-out duration-300 " href="{% url 'profile' follow.user.username %}">
+            <div class="h-11 w-11 rounded-full bg-cover bg-center [background-image:url('{{ follow.user.profile_pic.url }}')]"></div>
+            <div class="px-4">
+                <p class="text-sm font-bold dark:text-white text-black">{{ follow.user.first_name }} {{ follow.user.last_name}}</p>
+                <p class="text-xs dark:text-neutral-500 text-neutral-500">{{ follow.user.username }}</p>
+            </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+    <div class="profile-view bg-gray-100 dark:bg-zinc-900 mt-3 rounded-md overflow-hidden relative " data-user="{{username.username}}">
+        <div class="">
+            <div class="relative">
+                <div class="cover-image  w-full h-48 bg-center bg-cover " style="background-image: url({{username.cover.url}})"></div>
+                <div class="profile-image w-36 rounded-full h-36 bg-center bg-cover absolute  top-1/2 left-6 ring-2 ring-white -translate-y-1/2 " style="background-image: url({{username.profile_pic.url}})"></div>
+            </div>
+            <div class="profile-details px-3 py-2">
+                <div>
+                    {% if user.username == username.username %}
+                        <button class="btn btn-outline-success float-right bg-green-400 px-4 py-[2px] text-sm mt-2 mr-3 font-semibold text-black rounded-full" id="edit-profile-btn" onclick="showEditProfile();">Edit Profile</button>
+                    {% elif is_follower %}
+                        <button class="btn btn-success float-right bg-purple-400 px-4 py-[2px] text-sm mt-2 mr-3 font-semibold text-black rounded-full" onclick="unfollow_user(this,'{{username.username}}','edit_page')" id="following-btn">Unfollow</button>
+                    {% else %}
+                        <button class="btn btn-outline-success float-right bg-purple-400 px-4 py-[2px] text-sm mt-2 mr-3 font-semibold text-black rounded-full " onclick="follow_user(this,'{{username.username}}','edit_page')" id="follow-btn">Follow</button>
+                    {% endif %}
+                </div>
+                <div class="details-data">
+                    <h5 class="text-xl font-bold">{{username.first_name}} {{username.last_name}} <span class="text-xs font-normal ">({{username.username}})</span> </h5>
+                    <div class="flex flex-col gap-1">
+                        {% if username.staff !=  "na" %}
+                            <div class=" text-xs ">{{ username.staff }}</div>
+                        {% endif %}
+                        {% if username.branch == 'bca' %}
+                        <p class=" text-sm  ">Bachelor of Computer Application</p>
+                        {% elif username.branch == "bcom" %}
+                        <p >Bachelor of Commerce</p>
+                        {% elif username.branch == "ba" %}
+                        <p >Bachelor of Arts</p>
+                        {% else %}
+
+                        {% endif %}
+                    </div>
+                    <div class="bio pt-3 text-sm">
+                        {% if username.bio is not None %}
+                            {{username.bio|linebreaks}}
+                        {% endif %}
+                    </div>
+                    {% if username.username == request.user.username %}
+                        {% if username.staff == "na" or username.branch == "na" %}
+                        <div onclick="showEditProfile();" class=" text-blue-500 text-xs cursor-pointer ">add more details </div>
+                        {% endif %}
+                    {% endif %}
+                    
+                    
+                    <div class="flex justify-between pt-3 items-end ">
+                        <div>
+                            <strong>
+                                {{posts_count}}
+                            </strong>
+                            &nbsp;<span class="grey">Posts</span>
+                            &ensp;
+                            <button onclick="showFollowing()">
+                                <strong id="following__count">{{following_count | default:0}}</strong>&nbsp;<span class="grey1">Following</span>
+                            </button>
+                            &ensp;
+                            <button onclick="showFollowers()">
+                                <strong id="follower__count">{{follower_count | default:0}}</strong>&nbsp;<span class="grey">Followers</span>
+                            </button>
+                        </div>
+                        <div class="  text-xs text-zinc-400 " s>
+                            Joined {{username.date_joined | date:"F Y"}}
+                        </div>    
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="space"></div>
+    <script>
+
+
+        function showEditProfile(){
+            const editprofilepopup = document.querySelector('#editprofile');
+            editprofilepopup.classList.remove('hidden');
+            editprofilepopup.classList.add('flex');
+        }
+
+        const searchInput = document.querySelector("#search-input");
+        const searchInputFollowing = document.querySelector("#search-input-following");
+        const profiles = document.querySelectorAll(".h-fit a");
+
+        searchInput.addEventListener("input", (event) => {
+        const searchText = event.target.value.toLowerCase();
+
+        profiles.forEach((profile) => {
+            const name = profile.querySelector("p:first-child").textContent.toLowerCase();
+            if (name.includes(searchText)) {
+            profile.style.display = "flex";
+            } else {
+            profile.style.display = "none";
+            }
+        });
+        });
+
+        searchInputFollowing.addEventListener("input", (event) => {
+        const searchText = event.target.value.toLowerCase();
+
+        profiles.forEach((profile) => {
+            const name = profile.querySelector("p:first-child").textContent.toLowerCase();
+            if (name.includes(searchText)) {
+            profile.style.display = "flex";
+            } else {
+            profile.style.display = "none";
+            }
+        });
+        });
+
+        function coverupdate(file){
+            const uploadCoverImage = document.querySelector('#dropzone-file');
+            const previewFile = document.querySelector('.coverimage');
+            const reader = new FileReader();
+            const newfile = uploadCoverImage.files[0];
+            reader.readAsDataURL(newfile);
+            reader.addEventListener('load',() => {
+                previewFile.style.backgroundImage = `url(${reader.result})`;
+            })
+
+        }
+
+        function profileupdate(file){
+            const uploadProfileImage = document.querySelector('#dropzone-file-profile');
+            const previewFile = document.querySelector('.profileimage');
+            const reader = new FileReader();
+            const newfile = uploadProfileImage.files[0];
+
+            reader.addEventListener('load',() => {
+                previewFile.style.backgroundImage = `url(${reader.result})`;
+            })
+            reader.readAsDataURL(newfile);
+        }
+
+        document.querySelector('#editprofile').addEventListener('click',(e)=>{
+            const editContainer = document.querySelector('.editprofilecontainer');
+            const isInside = editContainer.contains(e.target);
+            if(!isInside){
+                document.querySelector('#editprofile').classList.remove('flex');
+                document.querySelector('#editprofile').classList.add('hidden');
+            }
+        })
+
+    </script>
+    <style>
+       
+          
+    </style>
+{% endblock %}
+
+{% block emptyprofile %}
+    <center>
+        <br>
+        <strong style="font-size: 1.2em;">{{username.first_name}} hasn't posted</strong>
+        <div class="grey" style="font-size: .9em;">When they do, their posts will show up here.</div>
+    </center>
+{% endblock %}

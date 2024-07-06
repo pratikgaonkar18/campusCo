@@ -1,0 +1,118 @@
+{% extends "network/layout2.html" %}
+
+{% load static  %}
+
+{% block title %}
+    Sign In | Network
+{% endblock %}
+
+{% block script %}
+    <script type"text/javascript" src="{% static 'network/signup.js' %}"></script>
+{% endblock %}
+
+{% block body %}
+
+
+<div class="w-screen h-screen grid grid-cols-5  font-inter ">
+    <div class="flex justify-center items-center w-full h-full relative col-span-2 ">
+        {% if not user.is_authenticated %}
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class=" text-black-600 -translate-x-2/4 px-3 py-2 bg-red-400   absolute  bottom-10 left-2/4 z-10">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        {% endif %}
+        
+        <div class=" w-3/5 px-10 py-6 rounded-md h-auto bg-transparent ">
+            <h3 class=" text-center  text-gray-700 font-black text-2xl pb-4 font-mono select-none " >Sign In</h3>
+            <form action="{% url 'login' %}" method="post" id="signin-form" >
+                {% csrf_token %}
+                <div class="form-group mb-2">
+                    <input class="form-control inp usrnm w-full h-10 p-4 outline-none border border-gray-300 placeholder:text-gray-300 placeholder:font-semibold placeholder:text-sm rounded-md " type="text" name="username" placeholder="Username" autocomplete="off" autofocus id='usnlogin'>
+                    <span class=" text-red-400 text-sm hidden " id='loginEmailError'>enter a valid email(ex: xyz@sbca.in)</span>
+                </div>
+                <div class="form-group">
+                    <input class="form-cont rol inp pswd w-full h-10 p-4 outline-none border border-gray-300 placeholder:text-gray-300 placeholder:font-semibold placeholder:text-sm rounded-md" type="password" name="password" placeholder="Password" autocomplete="off" id='pswd'>
+                    <span class="star text-red-400 text-sm"><small>{{message}}</small></span>
+                </div>
+                <center>
+                    <input class="w-full text-center bg-purple-500 hover:bg-purple-600 transition-all ease-in-out duration-200 text-white font-semibold p-2 mt-4 rounded-md text-sm" type="submit" value="Log in" id="submitButton" >
+                </center>
+            </form>
+            <div class="text-sm absolute bottom-5 left-2/4 -translate-x-2/4">
+                    Don't have an account?&nbsp;&nbsp;<a class="text-black font-bold" href="{% url 'register' %}">Sign Up</a>
+            </div>
+        </div>
+    </div>
+    <!-- grid column2 for animaiton -->
+    <div class='flex justify-center items-center relative bg-purple-50 w-full h-full col-span-3 '>
+        <div class="">
+            <div class="absolute left-2/4 top-2/4 z-30 -translate-x-2/4  -translate-y-2/4  select-text ">
+                <img src="{% static "university.svg" %}" class="select-none"/>
+            </div>
+            <div class="relative select-none ">
+            <iframe src="{% static 'login_animation.svg' %}"  width="700" height="700" ></iframe>
+            </div> 
+        </div>
+    </div>
+</div>
+    <script>
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@sbca\.in$/;
+    const loginEmailError = document.getElementById('loginEmailError');
+    const submitbutton = document.getElementById('submitButton');
+    
+    
+    
+    console.log("heeyy");
+    document.getElementById('usnlogin').addEventListener('keyup',() => {
+    console.log("kddk")
+    const emailInput = document.getElementById('usnlogin');
+    
+    console.log(emailRegex.test(emailInput.value))
+    
+    if(!emailRegex.test(emailInput.value)){
+        loginEmailError.classList.remove('hidden');
+        submitbutton.disabled = true;
+    }
+    else{
+        loginEmailError.classList.add('hidden');
+        submitbutton.disabled = false;
+    }
+    });
+    
+    
+    
+    
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".inp").forEach(input => {
+            input.addEventListener('input', () => {
+                console.log("dhendu")
+                if ((document.querySelector('.usrnm').value == "") || (document.querySelector('.pswd').value == "")) {
+                    console.log("heye")
+                    if(document.querySelector('input[type="submit"]').classList.contains('cursor-pointer')){
+                        document.querySelector('input[type="submit"]').classList.remove('cursor-pointer');
+                        document.querySelector('input[type="submit"]').classList.add('cursor-not-allowed');
+                    }
+                    else{
+                        document.querySelector('input[type="submit"]').classList.add('cursor-not-allowed');
+                    }
+                    
+                }
+                else {
+                    document.querySelector('input[type="submit"]').classList.remove('cursor-not-allowed');
+                    document.querySelector('input[type="submit"]').classList.add('cursor-pointer');
+                }
+            });
+        });
+    }); 
+    </script> 
+{% comment %} {% if messages %}
+    {% for message in messages %}
+        <div class=" bg-red-500 text-white px-4 py-2 absolute bottom-10 left-2/4 -translate-x-2/4 text-sm ">You were kicked out by admin</div>
+    {% endfor %}
+{% endif %} {% endcomment %}
+{% endblock %}
