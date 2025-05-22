@@ -79,7 +79,7 @@ project_root/
    ```
 
 6. **Access the app**
-   Visit [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser.
+   Visit [http://127.0.0.1:8000](http://127.0.0.1:8000/) in your browser.
 
 ## 📌 Notes
 
